@@ -169,8 +169,9 @@ router.get("/about", (req, res) => {
 });
 
 router.post("/signup", (req, res) => {
+  console.log(req.body);
   if (req.body.email && req.body.password) {
-    if (req.body.email === req.body.confirmpassword) {
+    if (req.body.password === req.body.confirmpassword) {
       let newUser = {
         email: req.body.email,
         password: req.body.password,
