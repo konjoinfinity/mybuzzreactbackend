@@ -181,7 +181,7 @@ router.post("/signup", (req, res) => {
         gender: req.body.gender,
         weight: req.body.weight
       };
-      User.findOne({ email: req.body.email }).then(user => {
+      User.findOne({ username: req.body.username }).then(user => {
         if (!user) {
           User.create(newUser).then(user => {
             if (user) {
@@ -221,6 +221,37 @@ router.get("/login", (req, res) => {
     error: req.flash("error"),
     info: req.flash("info")
   });
+});
+
+router.post("/login", (req, res) => {
+  if (req.body.username && req.body.password) {
+    User.findOne({ username: req.body.username }).then(user => {
+      if (user) {
+        let success = user.comparePassword(req.body.password, user.password);
+        if (success === true) {
+          var payload = {
+            id: user.id
+          };
+          var token = jwt.encode(payload, config.jwtSecret);
+          res.json({
+            token: token
+          });
+        } else {
+          res.json({
+            error: "Password does not match email account"
+          });
+        }
+      } else {
+        res.json({
+          error: "Email has not been registered"
+        });
+      }
+    });
+  } else {
+    res.json({
+      error: "Please enter both email and password"
+    });
+  }
 });
 
 router.post("/login", (req, res, next) => {

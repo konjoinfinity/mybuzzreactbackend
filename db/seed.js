@@ -1,215 +1,15 @@
 const mongoose = require("./connection");
 const User = require("../models/user");
-const passport = require("passport");
-
 mongoose.Promise = Promise;
 
-User.deleteMany({}).then(() => {
-  console.log("Users Deleted");
-});
-
-setTimeout(() => {
-  User.register(
-    {
-      username: "c.blundon@gmail.com",
+User.deleteMany({})
+  .then(() => {
+    User.create({
+      email: "c.blundon@gmail.com",
       gender: "Male",
       weight: 180,
+      password: "Test123",
       buzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Wine",
-          hours: 1,
-          dateCreated: Date.now()
-        }
-      ],
-      oldbuzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Beer",
-          hours: 1,
-          dateCreated: Date.now()
-        },
-        {
-          numberOfDrinks: 1,
-          drinkType: "Beer",
-          hours: 1,
-          dateCreated: Date.now()
-        }
-      ]
-    },
-    "Test123",
-    (err, user) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("User Created");
-      }
-    }
-  );
-
-  User.register(
-    {
-      username: "wesleyscholl@gmail.com",
-      gender: "Male",
-      weight: 210,
-      oldbuzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Beer",
-          hours: 1,
-          dateCreated: Date.now()
-        },
-        {
-          numberOfDrinks: 1,
-          drinkType: "Beer",
-          hours: 1,
-          dateCreated: Date.now()
-        }
-      ]
-    },
-    "777bmx777",
-    (err, user) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("User Created");
-      }
-    }
-  );
-
-  User.register(
-    {
-      username: "julie@julie.com",
-      gender: "Female",
-      weight: 150,
-      buzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Wine",
-          hours: 1
-        }
-      ],
-      oldbuzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Wine",
-          hours: 1,
-          dateCreated: Date.now()
-        },
-        {
-          numberOfDrinks: 1,
-          drinkType: "Wine",
-          hours: 1,
-          dateCreated: Date.now()
-        }
-      ]
-    },
-    "whywhywhy",
-    (err, user) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("User Created");
-      }
-    }
-  );
-
-  User.register(
-    {
-      username: "brian@brian.com",
-      gender: "Male",
-      weight: 190,
-      buzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Liquor",
-          hours: 1
-        },
-        {
-          numberOfDrinks: 1,
-          drinkType: "Liquor",
-          hours: 1
-        }
-      ],
-      oldbuzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Liquor",
-          hours: 1,
-          dateCreated: Date.now()
-        },
-        {
-          numberOfDrinks: 1,
-          drinkType: "Liquor",
-          hours: 1,
-          dateCreated: Date.now()
-        }
-      ]
-    },
-    "hellohello",
-    (err, user) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("User Created");
-      }
-    }
-  );
-
-  User.register(
-    {
-      username: "tim@tim.com",
-      gender: "Male",
-      weight: 210,
-      buzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Liquor",
-          hours: 1
-        }
-      ],
-      oldbuzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Beer",
-          hours: 1,
-          dateCreated: Date.now()
-        },
-        {
-          numberOfDrinks: 1,
-          drinkType: "Wine",
-          hours: 1,
-          dateCreated: Date.now()
-        }
-      ]
-    },
-    "byebyebye",
-    (err, user) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("User Created");
-      }
-    }
-  );
-
-  User.register(
-    {
-      username: "kate@kate.com",
-      gender: "Female",
-      weight: 140,
-
-      buzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Beer",
-          hours: 1
-        },
-        {
-          numberOfDrinks: 1,
-          drinkType: "Beer",
-          hours: 1
-        },
         {
           numberOfDrinks: 1,
           drinkType: "Beer",
@@ -222,98 +22,183 @@ setTimeout(() => {
           drinkType: "Beer",
           hours: 1,
           dateCreated: Date.now()
-        },
-        {
-          numberOfDrinks: 1,
-          drinkType: "Beer",
-          hours: 1,
-          dateCreated: Date.now()
         }
       ]
-    },
-    "sighsighsigh",
-    (err, user) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("User Created");
-      }
-    }
-  );
-
-  User.register(
+    }).then(console.log("User Created"));
+  })
+  .then(console.log("Users Deleted"));
+User.create({
+  username: "wesleyscholl@gmail.com",
+  gender: "Male",
+  weight: 210,
+  password: "777bmx777",
+  oldbuzzes: [
     {
-      username: "james@james.com",
-      gender: "Male",
-      weight: 200,
-      buzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Wine",
-          hours: 1
-        }
-      ],
-      oldbuzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Wine",
-          hours: 1,
-          dateCreated: Date.now()
-        },
-        {
-          numberOfDrinks: 1,
-          drinkType: "Wine",
-          hours: 1,
-          dateCreated: Date.now()
-        }
-      ]
+      numberOfDrinks: 1,
+      drinkType: "Beer",
+      hours: 1,
+      dateCreated: Date.now()
     },
-    "hihihi",
-    (err, user) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("User Created");
-      }
-    }
-  );
-}, 2000);
-
-setTimeout(() => {
-  User.register(
     {
-      username: "konjo@konjo.com",
-      gender: "Male",
-      weight: 200,
-      buzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Liquor",
-          hours: 1
-        }
-      ],
-      oldbuzzes: [
-        {
-          numberOfDrinks: 1,
-          drinkType: "Beer",
-          hours: 1,
-          dateCreated: Date.now()
-        },
-        {
-          numberOfDrinks: 1,
-          drinkType: "Wine",
-          hours: 1,
-          dateCreated: Date.now()
-        }
-      ]
-    },
-    "konjokonjo",
-    (err, user) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Last User Created");
-      }
+      numberOfDrinks: 1,
+      drinkType: "Beer",
+      hours: 1,
+      dateCreated: Date.now()
     }
-  );
-}, 4000);
+  ]
+}).then(console.log("User Created"));
+
+User.create({
+  username: "julie@julie.com",
+  gender: "Female",
+  weight: 150,
+  password: "whywhywhy",
+  buzzes: [
+    {
+      numberOfDrinks: 1,
+      drinkType: "Wine",
+      hours: 1
+    }
+  ],
+  oldbuzzes: [
+    {
+      numberOfDrinks: 1,
+      drinkType: "Wine",
+      hours: 1,
+      dateCreated: Date.now()
+    },
+    {
+      numberOfDrinks: 1,
+      drinkType: "Wine",
+      hours: 1,
+      dateCreated: Date.now()
+    }
+  ]
+}).then(console.log("User Created"));
+
+User.create({
+  username: "brian@brian.com",
+  gender: "Male",
+  weight: 190,
+  password: "hellohello",
+  buzzes: [
+    {
+      numberOfDrinks: 1,
+      drinkType: "Liquor",
+      hours: 1
+    },
+    {
+      numberOfDrinks: 1,
+      drinkType: "Liquor",
+      hours: 1
+    }
+  ],
+  oldbuzzes: [
+    {
+      numberOfDrinks: 1,
+      drinkType: "Liquor",
+      hours: 1,
+      dateCreated: Date.now()
+    },
+    {
+      numberOfDrinks: 1,
+      drinkType: "Liquor",
+      hours: 1,
+      dateCreated: Date.now()
+    }
+  ]
+}).then(console.log("User Created"));
+
+User.create({
+  username: "tim@tim.com",
+  gender: "Male",
+  weight: 210,
+  password: "byebyebye",
+  buzzes: [
+    {
+      numberOfDrinks: 1,
+      drinkType: "Liquor",
+      hours: 1
+    }
+  ],
+  oldbuzzes: [
+    {
+      numberOfDrinks: 1,
+      drinkType: "Beer",
+      hours: 1,
+      dateCreated: Date.now()
+    },
+    {
+      numberOfDrinks: 1,
+      drinkType: "Wine",
+      hours: 1,
+      dateCreated: Date.now()
+    }
+  ]
+}).then(console.log("User Created"));
+
+User.create({
+  username: "kate@kate.com",
+  gender: "Female",
+  weight: 140,
+  password: "sighsighsigh",
+  buzzes: [
+    {
+      numberOfDrinks: 1,
+      drinkType: "Beer",
+      hours: 1
+    },
+    {
+      numberOfDrinks: 1,
+      drinkType: "Beer",
+      hours: 1
+    },
+    {
+      numberOfDrinks: 1,
+      drinkType: "Beer",
+      hours: 1
+    }
+  ],
+  oldbuzzes: [
+    {
+      numberOfDrinks: 1,
+      drinkType: "Beer",
+      hours: 1,
+      dateCreated: Date.now()
+    },
+    {
+      numberOfDrinks: 1,
+      drinkType: "Beer",
+      hours: 1,
+      dateCreated: Date.now()
+    }
+  ]
+}).then(console.log("User Created"));
+
+User.create({
+  username: "james@james.com",
+  gender: "Male",
+  weight: 200,
+  password: "hihihi",
+  buzzes: [
+    {
+      numberOfDrinks: 1,
+      drinkType: "Wine",
+      hours: 1
+    }
+  ],
+  oldbuzzes: [
+    {
+      numberOfDrinks: 1,
+      drinkType: "Wine",
+      hours: 1,
+      dateCreated: Date.now()
+    },
+    {
+      numberOfDrinks: 1,
+      drinkType: "Wine",
+      hours: 1,
+      dateCreated: Date.now()
+    }
+  ]
+}).then(console.log("Last User Created"));
