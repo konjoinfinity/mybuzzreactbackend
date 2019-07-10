@@ -168,10 +168,6 @@ router.get("/about", (req, res) => {
   res.render("about");
 });
 
-router.get("/signup", (req, res) => {
-  res.render("user/signup", { error: req.flash("error") });
-});
-
 router.post("/signup", (req, res) => {
   if (req.body.email && req.body.password) {
     if (req.body.email === req.body.confirmpassword) {
@@ -216,13 +212,6 @@ router.post("/signup", (req, res) => {
   }
 });
 
-router.get("/login", (req, res) => {
-  res.render("user/login", {
-    error: req.flash("error"),
-    info: req.flash("info")
-  });
-});
-
 router.post("/login", (req, res) => {
   if (req.body.email && req.body.password) {
     User.findOne({ email: req.body.email }).then(user => {
@@ -252,34 +241,6 @@ router.post("/login", (req, res) => {
       error: "Please enter both email and password"
     });
   }
-});
-
-router.post("/login", (req, res, next) => {
-  var success = "You Logged In";
-  const authenticate = passport.authenticate("local", function(
-    err,
-    user,
-    info
-  ) {
-    if (err || !user) {
-      req.flash("error", info.message);
-      res.redirect("/user/login");
-    }
-    req.logIn(user, function(err) {
-      if (err) {
-        req.flash("error", err.message);
-        return res.redirect("/user/login");
-      }
-      req.flash("success", "You Successfully Logged In");
-      return res.redirect(`/user/${user._id}`);
-    });
-  });
-  authenticate(req, res, next);
-});
-
-router.get("/logout", (req, res) => {
-  req.logout();
-  res.redirect("/");
 });
 
 router.get("/user/:id", (req, res) => {
