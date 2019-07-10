@@ -18,6 +18,7 @@ const User = new Schema({
   username: String,
   gender: String,
   weight: Number,
+  password: String,
   bac: {
     type: Number,
     default: 0.0

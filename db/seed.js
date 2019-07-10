@@ -175,30 +175,32 @@ User.create({
   ]
 }).then(console.log("User Created"));
 
-User.create({
-  username: "james@james.com",
-  gender: "Male",
-  weight: 200,
-  password: "hihihi",
-  buzzes: [
-    {
-      numberOfDrinks: 1,
-      drinkType: "Wine",
-      hours: 1
-    }
-  ],
-  oldbuzzes: [
-    {
-      numberOfDrinks: 1,
-      drinkType: "Wine",
-      hours: 1,
-      dateCreated: Date.now()
-    },
-    {
-      numberOfDrinks: 1,
-      drinkType: "Wine",
-      hours: 1,
-      dateCreated: Date.now()
-    }
-  ]
-}).then(console.log("Last User Created"));
+setTimeout(() => {
+  User.create({
+    username: "james@james.com",
+    gender: "Male",
+    weight: 200,
+    password: "hihihi",
+    buzzes: [
+      {
+        numberOfDrinks: 1,
+        drinkType: "Wine",
+        hours: 1
+      }
+    ],
+    oldbuzzes: [
+      {
+        numberOfDrinks: 1,
+        drinkType: "Wine",
+        hours: 1,
+        dateCreated: Date.now()
+      },
+      {
+        numberOfDrinks: 1,
+        drinkType: "Wine",
+        hours: 1,
+        dateCreated: Date.now()
+      }
+    ]
+  }).then(console.log("Last User Created"));
+}, 1500);
