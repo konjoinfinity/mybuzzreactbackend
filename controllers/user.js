@@ -173,15 +173,15 @@ router.get("/signup", (req, res) => {
 });
 
 router.post("/signup", (req, res) => {
-  if (req.body.username && req.body.password) {
-    if (req.body.password === req.body.confirmpassword) {
+  if (req.body.email && req.body.password) {
+    if (req.body.email === req.body.confirmpassword) {
       let newUser = {
-        username: req.body.username,
+        email: req.body.email,
         password: req.body.password,
         gender: req.body.gender,
         weight: req.body.weight
       };
-      User.findOne({ username: req.body.username }).then(user => {
+      User.findOne({ email: req.body.email }).then(user => {
         if (!user) {
           User.create(newUser).then(user => {
             if (user) {
@@ -224,8 +224,8 @@ router.get("/login", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
-  if (req.body.username && req.body.password) {
-    User.findOne({ username: req.body.username }).then(user => {
+  if (req.body.email && req.body.password) {
+    User.findOne({ email: req.body.email }).then(user => {
       if (user) {
         let success = user.comparePassword(req.body.password, user.password);
         if (success === true) {

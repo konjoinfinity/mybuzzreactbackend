@@ -28,7 +28,7 @@ User.deleteMany({})
   })
   .then(console.log("Users Deleted"));
 User.create({
-  username: "wesleyscholl@gmail.com",
+  email: "wesleyscholl@gmail.com",
   gender: "Male",
   weight: 210,
   password: "777bmx777",
@@ -49,7 +49,7 @@ User.create({
 }).then(console.log("User Created"));
 
 User.create({
-  username: "julie@julie.com",
+  email: "julie@julie.com",
   gender: "Female",
   weight: 150,
   password: "whywhywhy",
@@ -77,7 +77,7 @@ User.create({
 }).then(console.log("User Created"));
 
 User.create({
-  username: "brian@brian.com",
+  email: "brian@brian.com",
   gender: "Male",
   weight: 190,
   password: "hellohello",
@@ -110,7 +110,7 @@ User.create({
 }).then(console.log("User Created"));
 
 User.create({
-  username: "tim@tim.com",
+  email: "tim@tim.com",
   gender: "Male",
   weight: 210,
   password: "byebyebye",
@@ -138,7 +138,7 @@ User.create({
 }).then(console.log("User Created"));
 
 User.create({
-  username: "kate@kate.com",
+  email: "kate@kate.com",
   gender: "Female",
   weight: 140,
   password: "sighsighsigh",
@@ -177,7 +177,7 @@ User.create({
 
 setTimeout(() => {
   User.create({
-    username: "james@james.com",
+    email: "james@james.com",
     gender: "Male",
     weight: 200,
     password: "hihihi",
