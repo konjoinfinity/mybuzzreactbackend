@@ -251,66 +251,37 @@ router.get("/user/:id", (req, res) => {
 
 router.post("/user/:id", (req, res) => {
   var dateTime = new Date();
-  var previousDrinkDate;
-  User.findOne({ _id: req.params.id })
-    .then(user => {
-      if (user.buzzes.length == 1) {
-        previousDrinkDate = user.buzzes[user.buzzes.length - 1].dateCreated;
-        previousDrinkDate.setHours(previousDrinkDate.getHours() + 1);
+  var totalBac;
+  var duration;
+  var newBuzz = {
+    numberOfDrinks: 1,
+    drinkType: req.body.drinkType,
+    hours: 0,
+    dateCreated: dateTime
+  };
+  User.findOne({ _id: req.params.id }).then(user => {
+    user.buzzes.push(newBuzz);
+    user.save().then(user => {
+      if (user.buzzes.length == 0) {
+        totalBac = getBAC(user.weight, user.gender, 1, req.body.drinkType, 0);
       }
-      if (user.buzzes.length > 1) {
-        previousDrinkDate = user.buzzes[user.buzzes.length - 1].holdTime;
-        previousDrinkDate.setHours(previousDrinkDate.getHours() + 1);
+      if (user.buzzes.length >= 1) {
+        duration = singleDuration(user.buzzes[0].dateCreated);
+        totalBac = getBAC(
+          user.weight,
+          user.gender,
+          user.buzzes.length,
+          "Liquor",
+          duration
+        );
+        totalBac = parseFloat(totalBac.toFixed(6));
       }
-    })
-    .then(e => {
-      var newBuzz = {
-        numberOfDrinks: 1,
-        drinkType: req.body.drinkType,
-        hours: 0,
-        dateCreated: dateTime
-      };
-      User.findOne({ _id: req.params.id }).then(user => {
-        if (user.buzzes.length >= 1) {
-          var newBuzzWithHold = {
-            numberOfDrinks: 1,
-            drinkType: req.body.drinkType,
-            hours: 0,
-            dateCreated: dateTime,
-            holdTime: previousDrinkDate
-          };
-          user.buzzes.push(newBuzzWithHold);
-        } else {
-          user.buzzes.push(newBuzz);
-        }
-        user.save().then(user => {
-          var total;
-          var buzzDuration;
-          var buzzHours;
-          var durations = [];
-          var totals = [];
-          var duration;
-          if (user.buzzes.length == 0) {
-            total = getBAC(user.weight, user.gender, 1, req.body.drinkType, 0);
-          }
-          if (user.buzzes.length >= 1) {
-            durations = durationLoop(
-              user,
-              user.buzzes.length - 1,
-              user.buzzes[user.buzzes.length - 1].dateCreated
-            );
-            totals = buzzLoop(user, req, durations, user.buzzes.length - 1);
-            total = totals.reduce((a, b) => a + b, 0);
-            total = parseFloat(total.toFixed(6));
-            console.log(total);
-          }
-          user.bac = total;
-          user.save((err, user) => {
-            res.json(user);
-          });
-        });
+      user.bac = totalBac;
+      user.save((err, user) => {
+        res.json(user);
       });
     });
+  });
 });
 
 router.get("/user/:id/bac", (req, res) => {
