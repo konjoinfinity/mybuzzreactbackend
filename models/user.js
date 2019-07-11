@@ -36,18 +36,15 @@ const User = new Schema({
   }
 });
 
-//Discovered that the password hash changes after every user
-//modification, it rehases the hashed password....
-
 User.pre("save", function(next) {
-  this.password = bcrypt.hashSync(this.password, saltRounds);
-  console.log(this.password);
+  var currentDate = new Date();
+  if (currentDate - this.dateCreated <= 2000) {
+    this.password = bcrypt.hashSync(this.password, saltRounds);
+  }
   next();
 });
 
 User.method("comparePassword", function(password, dbpassword) {
-  console.log(password);
-  console.log(dbpassword);
   if (bcrypt.compareSync(password, dbpassword)) {
     return true;
   } else {

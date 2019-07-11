@@ -15,7 +15,6 @@ function verifyToken(req, res, next) {
       .send({ auth: false, message: "Failed to authenticate token." });
   }
   decodedId = decoded.id;
-  console.log(decodedId);
   next();
 }
 
