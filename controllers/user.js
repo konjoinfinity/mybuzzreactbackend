@@ -170,6 +170,46 @@ router.get("/", verifyToken, (req, res) => {
   });
 });
 
+router.post("/", verifyToken, (req, res) => {
+  User.findById(decodedId, { password: 0 }, (err, user) => {
+    if (err)
+      return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
+    var dateTime = new Date();
+    var totalBac;
+    var duration;
+    var newBuzz = {
+      numberOfDrinks: 1,
+      drinkType: req.body.drinkType,
+      hours: 0,
+      dateCreated: dateTime
+    };
+    User.findOne({ _id: decodedId }).then(user => {
+      user.buzzes.push(newBuzz);
+      user.save().then(user => {
+        if (user.buzzes.length == 0) {
+          totalBac = getBAC(user.weight, user.gender, 1, req.body.drinkType, 0);
+        }
+        if (user.buzzes.length >= 1) {
+          duration = singleDuration(user.buzzes[0].dateCreated);
+          totalBac = getBAC(
+            user.weight,
+            user.gender,
+            user.buzzes.length,
+            "Liquor",
+            duration
+          );
+          totalBac = parseFloat(totalBac.toFixed(6));
+        }
+        user.bac = totalBac;
+        user.save((err, user) => {
+          res.json(user);
+        });
+      });
+    });
+  });
+});
+
 router.post("/signup", (req, res) => {
   if (req.body.email && req.body.password) {
     if (req.body.password === req.body.confirmpassword) {
@@ -245,46 +285,6 @@ router.post("/login", (req, res) => {
   }
 });
 
-router.post("/", verifyToken, (req, res) => {
-  User.findById(decodedId, { password: 0 }, (err, user) => {
-    if (err)
-      return res.status(500).send("There was a problem finding the user.");
-    if (!user) return res.status(404).send("No user found.");
-    var dateTime = new Date();
-    var totalBac;
-    var duration;
-    var newBuzz = {
-      numberOfDrinks: 1,
-      drinkType: req.body.drinkType,
-      hours: 0,
-      dateCreated: dateTime
-    };
-    User.findOne({ _id: decodedId }).then(user => {
-      user.buzzes.push(newBuzz);
-      user.save().then(user => {
-        if (user.buzzes.length == 0) {
-          totalBac = getBAC(user.weight, user.gender, 1, req.body.drinkType, 0);
-        }
-        if (user.buzzes.length >= 1) {
-          duration = singleDuration(user.buzzes[0].dateCreated);
-          totalBac = getBAC(
-            user.weight,
-            user.gender,
-            user.buzzes.length,
-            "Liquor",
-            duration
-          );
-          totalBac = parseFloat(totalBac.toFixed(6));
-        }
-        user.bac = totalBac;
-        user.save((err, user) => {
-          res.json(user);
-        });
-      });
-    });
-  });
-});
-
 router.get("/bac", verifyToken, (req, res) => {
   User.findById(decodedId, { password: 0 }, (err, user) => {
     if (err)
@@ -324,7 +324,7 @@ router.get("/bac", verifyToken, (req, res) => {
   });
 });
 
-router.put("del", verifyToken, (req, res) => {
+router.put("delete", verifyToken, (req, res) => {
   User.findById(decodedId, { password: 0 }, (err, user) => {
     if (err)
       return res.status(500).send("There was a problem finding the user.");
@@ -344,7 +344,7 @@ router.put("del", verifyToken, (req, res) => {
   });
 });
 
-router.put("olddel", verifyToken, (req, res) => {
+router.put("olddelete", verifyToken, (req, res) => {
   User.findById(decodedId, { password: 0 }, (err, user) => {
     if (err)
       return res.status(500).send("There was a problem finding the user.");
@@ -364,7 +364,7 @@ router.put("olddel", verifyToken, (req, res) => {
   });
 });
 
-router.put("delall", verifyToken, (req, res) => {
+router.put("alldelete", verifyToken, (req, res) => {
   User.findById(decodedId, { password: 0 }, (err, user) => {
     if (err)
       return res.status(500).send("There was a problem finding the user.");
@@ -380,7 +380,7 @@ router.put("delall", verifyToken, (req, res) => {
   });
 });
 
-router.put("olddelall", verifyToken, (req, res) => {
+router.put("removeoldall", verifyToken, (req, res) => {
   User.findById(decodedId, { password: 0 }, (err, user) => {
     if (err)
       return res.status(500).send("There was a problem finding the user.");
