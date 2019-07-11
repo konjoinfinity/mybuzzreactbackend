@@ -29,11 +29,7 @@ const User = new Schema({
   },
   buzzes: [Buzz],
   oldbuzzes: [Buzz],
-  timeSince: String,
-  created: {
-    type: Boolean,
-    default: true
-  }
+  timeSince: String
 });
 
 User.pre("save", function(next) {
