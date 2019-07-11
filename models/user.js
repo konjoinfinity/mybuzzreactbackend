@@ -10,8 +10,7 @@ const Buzz = new Schema({
   dateCreated: {
     type: Date,
     default: Date.now()
-  },
-  holdTime: Date
+  }
 });
 
 const User = new Schema({
