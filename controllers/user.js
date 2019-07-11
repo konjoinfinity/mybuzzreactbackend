@@ -255,22 +255,54 @@ router.get("/user/:id", verifyToken, (req, res) => {
   });
 });
 
-router.post("/user/:id", (req, res) => {
-  var dateTime = new Date();
-  var totalBac;
-  var duration;
-  var newBuzz = {
-    numberOfDrinks: 1,
-    drinkType: req.body.drinkType,
-    hours: 0,
-    dateCreated: dateTime
-  };
-  User.findOne({ _id: req.params.id }).then(user => {
-    user.buzzes.push(newBuzz);
-    user.save().then(user => {
-      if (user.buzzes.length == 0) {
-        totalBac = getBAC(user.weight, user.gender, 1, req.body.drinkType, 0);
-      }
+router.post("/user/:id", verifyToken, (req, res) => {
+  User.findById(decodedId, { password: 0 }, (err, user) => {
+    if (err)
+      return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
+    var dateTime = new Date();
+    var totalBac;
+    var duration;
+    var newBuzz = {
+      numberOfDrinks: 1,
+      drinkType: req.body.drinkType,
+      hours: 0,
+      dateCreated: dateTime
+    };
+    User.findOne({ _id: req.params.id }).then(user => {
+      user.buzzes.push(newBuzz);
+      user.save().then(user => {
+        if (user.buzzes.length == 0) {
+          totalBac = getBAC(user.weight, user.gender, 1, req.body.drinkType, 0);
+        }
+        if (user.buzzes.length >= 1) {
+          duration = singleDuration(user.buzzes[0].dateCreated);
+          totalBac = getBAC(
+            user.weight,
+            user.gender,
+            user.buzzes.length,
+            "Liquor",
+            duration
+          );
+          totalBac = parseFloat(totalBac.toFixed(6));
+        }
+        user.bac = totalBac;
+        user.save((err, user) => {
+          res.json(user);
+        });
+      });
+    });
+  });
+});
+
+router.get("/user/:id/bac", verifyToken, (req, res) => {
+  User.findById(decodedId, { password: 0 }, (err, user) => {
+    if (err)
+      return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
+    var totalBac;
+    var duration;
+    User.findOne({ _id: req.params.id }).then(user => {
       if (user.buzzes.length >= 1) {
         duration = singleDuration(user.buzzes[0].dateCreated);
         totalBac = getBAC(
@@ -281,100 +313,99 @@ router.post("/user/:id", (req, res) => {
           duration
         );
         totalBac = parseFloat(totalBac.toFixed(6));
-      }
-      user.bac = totalBac;
-      user.save((err, user) => {
-        res.json(user);
-      });
-    });
-  });
-});
-
-router.get("/user/:id/bac", (req, res) => {
-  var totalBac;
-  var duration;
-  User.findOne({ _id: req.params.id }).then(user => {
-    if (user.buzzes.length >= 1) {
-      duration = singleDuration(user.buzzes[0].dateCreated);
-      totalBac = getBAC(
-        user.weight,
-        user.gender,
-        user.buzzes.length,
-        "Liquor",
-        duration
-      );
-      totalBac = parseFloat(totalBac.toFixed(6));
-      if (totalBac < 0) {
-        user.bac = 0;
-        user.save((err, user) => {
-          res.json(user);
-        });
+        if (totalBac < 0) {
+          user.bac = 0;
+          user.save((err, user) => {
+            res.json(user);
+          });
+        } else {
+          user.bac = totalBac;
+          user.save((err, user) => {
+            res.json(user);
+          });
+        }
       } else {
         user.bac = totalBac;
         user.save((err, user) => {
           res.json(user);
         });
       }
-    } else {
-      user.bac = totalBac;
-      user.save((err, user) => {
-        res.json(user);
-      });
-    }
-  });
-});
-
-router.put("/user/:id/del", (req, res) => {
-  var buzzId = { _id: req.body.index };
-  User.findOneAndUpdate(
-    { _id: req.params.id },
-    { $pull: { buzzes: buzzId } }
-  ).then(user => {
-    if (user.buzzes.length == 1) {
-      user.bac = 0;
-    }
-    user.save((err, user) => {
-      res.json(user);
     });
   });
 });
 
-router.put("/user/:id/olddel", (req, res) => {
-  var buzzId = { _id: req.body.index };
-  User.findOneAndUpdate(
-    { _id: req.params.id },
-    { $pull: { oldbuzzes: buzzId } }
-  ).then(user => {
-    if (user.buzzes.length == 1) {
-      user.bac = 0;
-    }
-    user.save((err, user) => {
-      res.json(user);
+router.put("/user/:id/del", verifyToken, (req, res) => {
+  User.findById(decodedId, { password: 0 }, (err, user) => {
+    if (err)
+      return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
+    var buzzId = { _id: req.body.index };
+    User.findOneAndUpdate(
+      { _id: req.params.id },
+      { $pull: { buzzes: buzzId } }
+    ).then(user => {
+      if (user.buzzes.length == 1) {
+        user.bac = 0;
+      }
+      user.save((err, user) => {
+        res.json(user);
+      });
     });
   });
 });
 
-router.put("/user/:id/delall", (req, res) => {
-  User.findOneAndUpdate({ _id: req.params.id }, { $pull: { buzzes: {} } }).then(
-    user => {
+router.put("/user/:id/olddel", verifyToken, (req, res) => {
+  User.findById(decodedId, { password: 0 }, (err, user) => {
+    if (err)
+      return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
+    var buzzId = { _id: req.body.index };
+    User.findOneAndUpdate(
+      { _id: req.params.id },
+      { $pull: { oldbuzzes: buzzId } }
+    ).then(user => {
+      if (user.buzzes.length == 1) {
+        user.bac = 0;
+      }
+      user.save((err, user) => {
+        res.json(user);
+      });
+    });
+  });
+});
+
+router.put("/user/:id/delall", verifyToken, (req, res) => {
+  User.findById(decodedId, { password: 0 }, (err, user) => {
+    if (err)
+      return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
+    User.findOneAndUpdate(
+      { _id: req.params.id },
+      { $pull: { buzzes: {} } }
+    ).then(user => {
       user.bac = 0;
       user.save((err, user) => {
         res.json(user);
       });
-    }
-  );
+    });
+  });
 });
 
-router.put("/user/:id/olddelall", (req, res) => {
-  User.findOneAndUpdate(
-    { _id: req.params.id },
-    { $pull: { oldbuzzes: {} } }
-  ).then(user => {
-    if (user.buzzes.length == 1) {
-      user.bac = 0;
-    }
-    user.save((err, user) => {
-      res.json(user);
+router.put("/user/:id/olddelall", verifyToken, (req, res) => {
+  User.findById(decodedId, { password: 0 }, (err, user) => {
+    if (err)
+      return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
+    User.findOneAndUpdate(
+      { _id: req.params.id },
+      { $pull: { oldbuzzes: {} } }
+    ).then(user => {
+      if (user.buzzes.length == 1) {
+        user.bac = 0;
+      }
+      user.save((err, user) => {
+        res.json(user);
+      });
     });
   });
 });
