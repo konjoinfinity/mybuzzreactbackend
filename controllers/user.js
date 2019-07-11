@@ -73,10 +73,6 @@ router.get("/", verifyToken, (req, res) => {
   });
 });
 
-router.get("/about", (req, res) => {
-  res.render("about");
-});
-
 router.post("/signup", (req, res) => {
   console.log(req.body);
   if (req.body.email && req.body.password) {
