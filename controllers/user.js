@@ -74,7 +74,6 @@ router.get("/", verifyToken, (req, res) => {
 });
 
 router.post("/signup", (req, res) => {
-  console.log(req.body);
   if (req.body.email && req.body.password) {
     if (req.body.password === req.body.confirmpassword) {
       let newUser = {
@@ -119,7 +118,6 @@ router.post("/signup", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
-  console.log(req.body);
   if (req.body.email && req.body.password) {
     User.findOne({ email: req.body.email }).then(user => {
       if (user) {
@@ -393,7 +391,6 @@ router.put("/user/:id/delall", verifyToken, (req, res) => {
 });
 
 router.put("/user/:id/olddelall", verifyToken, (req, res) => {
-  console.log(req.headers);
   User.findById(decodedId, { password: 0 }, (err, user) => {
     if (err)
       return res.status(500).send("There was a problem finding the user.");
