@@ -64,8 +64,13 @@ function getBAC(weight, gender, drinks, drinkType, hours) {
   return bac;
 }
 
-router.get("/", (req, res) => {
-  User.find({}).then(users => res.json(users));
+router.get("/", verifyToken, (req, res) => {
+  User.findById(decodedId, { password: 0 }, (err, user) => {
+    if (err)
+      return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
+    User.find({}).then(users => res.json(users));
+  });
 });
 
 router.get("/about", (req, res) => {
@@ -148,40 +153,79 @@ router.post("/login", (req, res) => {
   }
 });
 
-router.get("/user/:id", (req, res) => {
-  var currentTime = new Date();
-  var totalBac;
-  var duration;
-  User.findOne({ _id: req.params.id }).then(user => {
-    if (user.buzzes.length >= 1) {
-      duration = singleDuration(user.buzzes[0].dateCreated);
-      totalBac = getBAC(
-        user.weight,
-        user.gender,
-        user.buzzes.length,
-        "Liquor",
-        duration
-      );
-      totalBac = parseFloat(totalBac.toFixed(6));
-      if (totalBac <= 0) {
-        for (i = 0; i < user.buzzes.length; i++) {
-          var oldBuzz = {
-            numberOfDrinks: 1,
-            drinkType: user.buzzes[i].drinkType,
-            hours: 1,
-            dateCreated: user.buzzes[i].dateCreated
-          };
-          var oldBuzzId = { _id: user.buzzes[i]._id };
-          User.findOneAndUpdate(
-            { _id: req.params.id },
-            { $pull: { buzzes: oldBuzzId } }
-          ).then(user => {
-            user.oldbuzzes.push(oldBuzz);
+router.get("/user/:id", verifyToken, (req, res) => {
+  User.findById(decodedId, { password: 0 }, (err, user) => {
+    if (err)
+      return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
+    var currentTime = new Date();
+    var totalBac;
+    var duration;
+    User.findOne({ _id: req.params.id }).then(user => {
+      if (user.buzzes.length >= 1) {
+        duration = singleDuration(user.buzzes[0].dateCreated);
+        totalBac = getBAC(
+          user.weight,
+          user.gender,
+          user.buzzes.length,
+          "Liquor",
+          duration
+        );
+        totalBac = parseFloat(totalBac.toFixed(6));
+        if (totalBac <= 0) {
+          for (i = 0; i < user.buzzes.length; i++) {
+            var oldBuzz = {
+              numberOfDrinks: 1,
+              drinkType: user.buzzes[i].drinkType,
+              hours: 1,
+              dateCreated: user.buzzes[i].dateCreated
+            };
+            var oldBuzzId = { _id: user.buzzes[i]._id };
+            User.findOneAndUpdate(
+              { _id: req.params.id },
+              { $pull: { buzzes: oldBuzzId } }
+            ).then(user => {
+              user.oldbuzzes.push(oldBuzz);
+              user.save((err, user) => {
+                console.log("Moved buzz to old");
+              });
+            });
+          }
+          if (user.oldbuzzes.length >= 1) {
+            User.findOne({ _id: req.params.id }).then(user => {
+              var date2 = currentTime.getTime();
+              var date1 = user.oldbuzzes[
+                user.oldbuzzes.length - 1
+              ].dateCreated.getTime();
+              var dayHourMin = getDayHourMin(date1, date2);
+              var days = dayHourMin[0];
+              var hours = dayHourMin[1];
+              var minutes = dayHourMin[2];
+              var seconds = dayHourMin[3];
+              user.timeSince = `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds`;
+              user.bac = 0;
+              user.save((err, user) => {
+                res.json(user);
+              });
+            });
+          } else {
+            User.findOne({ _id: req.params.id }).then(user => {
+              user.bac = 0;
+              user.timeSince = "";
+              user.save((err, user) => {
+                res.json(user);
+              });
+            });
+          }
+        } else {
+          User.findOne({ _id: req.params.id }).then(user => {
+            user.bac = totalBac;
             user.save((err, user) => {
-              console.log("Moved buzz to old");
+              res.json(user);
             });
           });
         }
+      } else {
         if (user.oldbuzzes.length >= 1) {
           User.findOne({ _id: req.params.id }).then(user => {
             var date2 = currentTime.getTime();
@@ -193,59 +237,25 @@ router.get("/user/:id", (req, res) => {
             var hours = dayHourMin[1];
             var minutes = dayHourMin[2];
             var seconds = dayHourMin[3];
+            if ((user.buzzes.length = 0)) {
+              user.bac = 0;
+            }
             user.timeSince = `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds`;
-            user.bac = 0;
             user.save((err, user) => {
               res.json(user);
             });
           });
         } else {
-          User.findOne({ _id: req.params.id }).then(user => {
-            user.bac = 0;
+          if (user.buzzes.length == 0) {
             user.timeSince = "";
-            user.save((err, user) => {
-              res.json(user);
-            });
-          });
-        }
-      } else {
-        User.findOne({ _id: req.params.id }).then(user => {
-          user.bac = totalBac;
-          user.save((err, user) => {
-            res.json(user);
-          });
-        });
-      }
-    } else {
-      if (user.oldbuzzes.length >= 1) {
-        User.findOne({ _id: req.params.id }).then(user => {
-          var date2 = currentTime.getTime();
-          var date1 = user.oldbuzzes[
-            user.oldbuzzes.length - 1
-          ].dateCreated.getTime();
-          var dayHourMin = getDayHourMin(date1, date2);
-          var days = dayHourMin[0];
-          var hours = dayHourMin[1];
-          var minutes = dayHourMin[2];
-          var seconds = dayHourMin[3];
-          if ((user.buzzes.length = 0)) {
             user.bac = 0;
           }
-          user.timeSince = `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds`;
           user.save((err, user) => {
             res.json(user);
           });
-        });
-      } else {
-        if (user.buzzes.length == 0) {
-          user.timeSince = "";
-          user.bac = 0;
         }
-        user.save((err, user) => {
-          res.json(user);
-        });
       }
-    }
+    });
   });
 });
 
