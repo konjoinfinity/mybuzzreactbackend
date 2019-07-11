@@ -324,7 +324,7 @@ router.get("/bac", verifyToken, (req, res) => {
   });
 });
 
-router.put("delete", verifyToken, (req, res) => {
+router.put("/delete", verifyToken, (req, res) => {
   User.findById(decodedId, { password: 0 }, (err, user) => {
     if (err)
       return res.status(500).send("There was a problem finding the user.");
@@ -344,7 +344,7 @@ router.put("delete", verifyToken, (req, res) => {
   });
 });
 
-router.put("olddelete", verifyToken, (req, res) => {
+router.put("/olddelete", verifyToken, (req, res) => {
   User.findById(decodedId, { password: 0 }, (err, user) => {
     if (err)
       return res.status(500).send("There was a problem finding the user.");
@@ -364,7 +364,7 @@ router.put("olddelete", verifyToken, (req, res) => {
   });
 });
 
-router.put("alldelete", verifyToken, (req, res) => {
+router.put("/alldelete", verifyToken, (req, res) => {
   User.findById(decodedId, { password: 0 }, (err, user) => {
     if (err)
       return res.status(500).send("There was a problem finding the user.");
@@ -380,7 +380,7 @@ router.put("alldelete", verifyToken, (req, res) => {
   });
 });
 
-router.put("removeoldall", verifyToken, (req, res) => {
+router.put("/removeoldall", verifyToken, (req, res) => {
   User.findById(decodedId, { password: 0 }, (err, user) => {
     if (err)
       return res.status(500).send("There was a problem finding the user.");
