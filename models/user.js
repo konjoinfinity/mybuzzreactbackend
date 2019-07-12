@@ -33,7 +33,7 @@ const User = new Schema({
 
 User.pre("save", function(next) {
   var currentDate = new Date();
-  if (currentDate - this.dateCreated <= 2000) {
+  if (currentDate - this.dateCreated <= 8000) {
     this.password = bcrypt.hashSync(this.password, saltRounds);
   }
   next();
